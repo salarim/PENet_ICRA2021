@@ -99,6 +99,11 @@ parser.add_argument('--data-folder-save',
                     type=str,
                     metavar='PATH',
                     help='data folder test results(default: none)')
+parser.add_argument('--data-folder-test',
+                    default='val/2011_09_26_drive_0002_sync/',
+                    type=str,
+                    metavar='PATH',
+                    help='data folder test (default: none)')
 parser.add_argument('-i',
                     '--input',
                     type=str,
@@ -256,7 +261,7 @@ def iterate(mode, args, loader, model, optimizer, logger, epoch):
             str_i = str(i)
             path_i = str_i.zfill(10) + '.png'
             path = os.path.join(args.data_folder_save, path_i)
-            vis_utils.save_depth_as_uint16png_upload(pred, path)
+            vis_utils.save_depth_as_uint16png_upload(pred, batch_data['d'], path)
 
         if(not args.evaluate):
             gpu_time = time.time() - start

@@ -103,9 +103,18 @@ def save_depth_as_uint16png(img, filename):
     img = (img * 256).astype('uint16')
     cv2.imwrite(filename, img)
 
-def save_depth_as_uint16png_upload(img, filename):
+def save_depth_as_uint16png_upload(img, d, filename):
     #from tensor
     img = np.squeeze(img.data.cpu().numpy())
+    d = np.squeeze(d.data.cpu().numpy())
+
+    img[np.cumsum(d, axis=0)==0.0] = 0.0
+
+    org_img = np.zeros((375, 1242))
+    top_crop = 0
+    org_img[23+top_crop:375,13:1229] = img[top_crop:,:]
+    img = org_img
+
     img = (img * 256.0).astype('uint16')
     img_buffer = img.tobytes()
     imgsave = Image.new("I", img.T.shape)

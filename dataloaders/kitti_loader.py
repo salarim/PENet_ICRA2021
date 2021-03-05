@@ -97,15 +97,39 @@ def get_paths_and_transform(split, args):
             def get_rgb_paths(p):
                 return p.replace("groundtruth_depth", "image")
     elif split == "test_completion":
-        transform = no_transform
-        glob_d = os.path.join(
-            args.data_folder,
-            "data_depth_selection/test_depth_completion_anonymous/velodyne_raw/*.png"
-        )
-        glob_gt = None  # "test_depth_completion_anonymous/"
-        glob_rgb = os.path.join(
-            args.data_folder,
-            "data_depth_selection/test_depth_completion_anonymous/image/*.png")
+        if args.data_folder_test is not None:
+            transform = val_transform
+            glob_d = os.path.join(
+                args.data_folder,
+                'data_depth_velodyne/',
+                args.data_folder_test,
+                'proj_depth/velodyne_raw/image_02/*.png'
+            )
+            glob_gt = os.path.join(
+                args.data_folder,
+                'data_depth_annotated/',
+                args.data_folder_test,
+                'proj_depth/groundtruth/image_02/*.png'
+            )
+
+            def get_rgb_paths(p):
+                ps = p.split('/')
+                date_liststr = []
+                date_liststr.append(ps[-5][:10])
+                pnew = '/'.join(date_liststr + ps[-5:-4] + ps[-2:-1] + ['data'] + ps[-1:])
+                pnew = os.path.join(args.data_folder_rgb, pnew)
+                return pnew
+                
+        else:
+            transform = no_transform
+            glob_d = os.path.join(
+                args.data_folder,
+                "data_depth_selection/test_depth_completion_anonymous/velodyne_raw/*.png"
+            )
+            glob_gt = None  # "test_depth_completion_anonymous/"
+            glob_rgb = os.path.join(
+                args.data_folder,
+                "data_depth_selection/test_depth_completion_anonymous/image/*.png")
     elif split == "test_prediction":
         transform = no_transform
         glob_d = None
@@ -139,8 +163,7 @@ def get_paths_and_transform(split, args):
         raise (RuntimeError("Requested rgb images but none was found"))
     if len(paths_rgb) == 0 and args.use_g:
         raise (RuntimeError("Requested gray images but no rgb was found"))
-    if len(paths_rgb) != len(paths_d) or len(paths_rgb) != len(paths_gt):
-        print(len(paths_rgb), len(paths_d), len(paths_gt))
+    # if len(paths_rgb) != len(paths_d) or len(paths_rgb) != len(paths_gt):
         # for i in range(999):
         #    print("#####")
         #    print(paths_rgb[i])
