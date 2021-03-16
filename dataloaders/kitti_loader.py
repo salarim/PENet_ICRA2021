@@ -298,6 +298,9 @@ def val_transform(rgb, sparse, target, position, args):
     if position is not None:
         position = transform(position)
 
+    sparse_transform = transforms.DropBeams()
+    sparse = sparse_transform(sparse)
+
     return rgb, sparse, target, position
 
 
